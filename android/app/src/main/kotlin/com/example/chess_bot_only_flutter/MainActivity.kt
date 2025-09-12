@@ -1,4 +1,4 @@
-package com.example.chess_bot_only_flutter
+package com.shimpa.chess_bot_only_flutter
 
 import io.flutter.embedding.android.FlutterActivity
 
