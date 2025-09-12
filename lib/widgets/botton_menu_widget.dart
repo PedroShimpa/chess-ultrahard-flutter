@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../screens/chess_screen.dart';
 import '../screens/solo_game_screen.dart';
 import '../services/api_service.dart';
-import '../screens/login_screen.dart';
 
 class BottomMenu extends StatelessWidget {
   final int currentIndex;
@@ -29,16 +28,7 @@ class BottomMenu extends StatelessWidget {
             context,
             MaterialPageRoute(builder: (context) => const SoloGameScreen()),
           );
-        } else if (index == 2) {
-          final api = ApiService();
-          await api.logout();
-          if (context.mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-            );
-          }
-        }
+        } 
         onTap(index);
       },
       items: const [
@@ -49,10 +39,6 @@ class BottomMenu extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
           label: "Solo",
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.logout),
-          label: "Sair",
         ),
       ],
     );

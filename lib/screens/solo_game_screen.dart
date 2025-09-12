@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:chess/chess.dart' as chess;
 import '../services/api_service.dart';
-import 'login_screen.dart';
 import 'chess_screen.dart';
 
 class SoloGameScreen extends StatefulWidget {
@@ -25,6 +24,7 @@ class _SoloGameScreenState extends State<SoloGameScreen> {
   String bestMoveWhite = "";
   String bestMoveBlack = "";
   int _selectedIndex = 1;
+  int game_id = 0;
 
   // Estado de orientação do tabuleiro
   late PlayerColor boardOrientation;
@@ -44,10 +44,11 @@ class _SoloGameScreenState extends State<SoloGameScreen> {
 
   Future<void> startGame() async {
     setState(() => loading = true);
-    final fen = await api.startGame();
-    if (fen != null) {
-      controller.loadFen(fen);
-      game.load(fen);
+    final body = await api.startGame();
+    if (body != null) {
+      controller.loadFen(body['fen']);
+      game.load(body['fen']);
+      game_id = body['game_id'];
     }
     setState(() => loading = false);
   }
@@ -61,7 +62,7 @@ class _SoloGameScreenState extends State<SoloGameScreen> {
     controller.makeMove(from: from, to: to);
     game.move({'from': from, 'to': to});
 
-    final res = await api.soloMove(playerMove);
+    final res = await api.soloMove(game_id, playerMove);
     if (!mounted) return;
 
     if (res == null) {
@@ -120,15 +121,6 @@ class _SoloGameScreenState extends State<SoloGameScreen> {
     });
   }
 
-  void logout() async {
-    await api.logout();
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-    );
-  }
-
   void _onMenuTap(int index) {
     setState(() {
       _selectedIndex = index;
@@ -141,8 +133,6 @@ class _SoloGameScreenState extends State<SoloGameScreen> {
       );
     } else if (index == 1) {
       resetGame(); // já está na tela solo, só reinicia
-    } else if (index == 2) {
-      logout();
     }
   }
 

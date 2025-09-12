@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:chess/chess.dart' as chess;
 import '../services/api_service.dart';
-import 'login_screen.dart';
 
 class ChessScreen extends StatefulWidget {
   final bool playAsBlack;
@@ -19,6 +18,7 @@ class _ChessScreenState extends State<ChessScreen> {
   bool loading = true;
   late chess.Chess game;
   final ApiService api = ApiService();
+  int game_id = 0;
   int _selectedIndex = 0;
 
   @override
@@ -31,15 +31,16 @@ class _ChessScreenState extends State<ChessScreen> {
 
   Future<void> startGame() async {
     setState(() => loading = true);
-    final fen = await api.startGame();
-    if (fen != null) {
-      controller.loadFen(fen);
-      game.load(fen);
+    final body = await api.startGame();
+    if (body != null) {
+      controller.loadFen(body['fen']);
+      game.load(body['fen']);
+      game_id = body['game_id'];
     }
     if (!mounted) return;
 
     if (widget.playAsBlack) {
-      final res = await api.makeMove("0000"); // engine joga primeiro
+      final res = await api.makeMove(game_id, "0000"); 
       if (res != null && res['engine_move'] != null) {
         final move = res['engine_move'];
         final from = move.substring(0, 2);
@@ -61,7 +62,7 @@ class _ChessScreenState extends State<ChessScreen> {
     controller.makeMove(from: from, to: to);
     game.move({'from': from, 'to': to});
 
-    final res = await api.makeMove(playerMove);
+    final res = await api.makeMove(game_id, playerMove);
     if (!mounted) return;
 
     if (res == null || res['engine_move'] == null) {
@@ -118,15 +119,6 @@ class _ChessScreenState extends State<ChessScreen> {
     await startGame();
   }
 
-  void logout() async {
-    await api.logout();
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-    );
-  }
-
   void _onMenuTap(int index) {
     setState(() {
       _selectedIndex = index;
@@ -139,9 +131,7 @@ class _ChessScreenState extends State<ChessScreen> {
         context,
         MaterialPageRoute(builder: (context) => const SoloGameScreen()),
       );
-    } else if (index == 2) {
-      logout();
-    }
+    } 
   }
 
   @override

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'screens/login_screen.dart';
 import 'screens/chess_screen.dart';
 
 void main() async {
@@ -22,9 +21,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Chess App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: initialToken != null && initialToken!.isNotEmpty
-          ? const ChessScreen(playAsBlack: false) // ou true se quiser jogar de pretas
-          : const LoginScreen(),
+      home: 
+          const ChessScreen(playAsBlack: false) 
     );
   }
 }
