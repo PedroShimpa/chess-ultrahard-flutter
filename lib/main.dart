@@ -8,7 +8,6 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token');
-  print(token);
 
   runApp(MyApp(initialToken: token));
 }

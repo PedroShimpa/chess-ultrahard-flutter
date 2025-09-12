@@ -1,8 +1,10 @@
+import 'package:chess_bot_only_flutter/screens/solo_game_screen.dart';
+import 'package:chess_bot_only_flutter/widgets/botton_menu_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:chess/chess.dart' as chess;
 import '../services/api_service.dart';
-import 'login_screen.dart'; // tela de login
+import 'login_screen.dart';
 
 class ChessScreen extends StatefulWidget {
   final bool playAsBlack;
@@ -17,6 +19,7 @@ class _ChessScreenState extends State<ChessScreen> {
   bool loading = true;
   late chess.Chess game;
   final ApiService api = ApiService();
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -64,9 +67,9 @@ class _ChessScreenState extends State<ChessScreen> {
     if (res == null || res['engine_move'] == null) {
       controller.loadFen(prevFen);
       game.load(prevFen);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Jogada inválida!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Jogada inválida!")));
       return;
     }
 
@@ -124,6 +127,23 @@ class _ChessScreenState extends State<ChessScreen> {
     );
   }
 
+  void _onMenuTap(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    if (index == 0) {
+      resetGame(); // reinicia no modo difícil
+    } else if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SoloGameScreen()),
+      );
+    } else if (index == 2) {
+      logout();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,31 +160,26 @@ class _ChessScreenState extends State<ChessScreen> {
                   ChessBoard(
                     controller: controller,
                     boardColor: BoardColor.brown,
-                    boardOrientation:
-                        widget.playAsBlack ? PlayerColor.black : PlayerColor.white,
+                    boardOrientation: widget.playAsBlack
+                        ? PlayerColor.black
+                        : PlayerColor.white,
                     onMove: onPlayerMove,
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: resetGame,
-                        icon: const Icon(Icons.refresh),
-                        label: const Text("Resetar Jogo"),
-                      ),
-                      const SizedBox(width: 20),
-                      ElevatedButton.icon(
-                        onPressed: logout,
-                        icon: const Icon(Icons.logout),
-                        label: const Text("Sair"),
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      ),
-                    ],
+                  ElevatedButton.icon(
+                    onPressed: resetGame,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text("Resetar Jogo"),
                   ),
                 ],
               ),
             ),
+      bottomNavigationBar: BottomMenu(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          // callback se quiser monitorar a troca de abas
+        },
+      ),
     );
   }
 }

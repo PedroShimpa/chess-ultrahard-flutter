@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  final String baseUrl = "http://192.168.1.67:8080/api";
+  final String baseUrl = "http://154.38.182.36:7061/api";
+  // final String baseUrl = "http://192.168.1.67:8080/api";
   String? token;
 
   ApiService() {
@@ -62,10 +63,7 @@ class ApiService {
 
   Future<String?> startGame() async {
     final h = await headers;
-    final res = await http.post(
-      Uri.parse('$baseUrl/game/new'),
-      headers: h,
-    );
+    final res = await http.post(Uri.parse('$baseUrl/game/new'), headers: h);
     if (res.statusCode == 200) {
       return jsonDecode(res.body)['fen'];
     }
@@ -92,5 +90,20 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
     token = null;
+  }
+
+  Future<Map<String, dynamic>?> soloMove(String move) async {
+    final url = Uri.parse("$baseUrl/game/solo");
+    final h = await headers;
+    final response = await http.post(
+      url,
+      headers: h,
+      body: jsonEncode({"move": move}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    return null;
   }
 }
