@@ -20,9 +20,27 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Chess App',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: 
-          const ChessScreen(playAsBlack: false) 
+      theme: ThemeData(
+        primarySwatch: Colors.brown,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF2E2E2E),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1E1E1E),
+          foregroundColor: Colors.white,
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Color(0xFF1E1E1E),
+          selectedItemColor: Colors.brown,
+          unselectedItemColor: Colors.white70,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.brown,
+            foregroundColor: Colors.white,
+          ),
+        ),
+      ),
+      home: const ChessScreen(playAsBlack: false),
     );
   }
 }

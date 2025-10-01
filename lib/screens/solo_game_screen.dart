@@ -1,9 +1,10 @@
-import 'package:chess_bot_only_flutter/widgets/botton_menu_widget.dart';
+import 'package:chess_bot_only_flutter/widgets/bottom_menu_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:chess/chess.dart' as chess;
 import '../services/api_service.dart';
 import 'chess_screen.dart';
+import 'problems_screen.dart';
 
 class SoloGameScreen extends StatefulWidget {
   final bool playAsBlack;
@@ -133,6 +134,11 @@ class _SoloGameScreenState extends State<SoloGameScreen> {
       );
     } else if (index == 1) {
       resetGame(); // já está na tela solo, só reinicia
+    } else if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProblemsScreen()),
+      );
     }
   }
 
@@ -250,7 +256,7 @@ class BestMovePainter extends CustomPainter {
     final squareSize = size.width / 8;
 
     final paint = Paint()
-      ..color = Colors.green.withOpacity(0.5)
+      ..color = Colors.green.withValues(alpha: 0.5)
       ..style = PaintingStyle.fill;
 
     // Destacar origem

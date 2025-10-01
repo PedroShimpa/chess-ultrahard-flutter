@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   final String baseUrl = "http://154.38.182.36:7061/api";
@@ -49,6 +48,17 @@ class ApiService {
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
+    }
+    return null;
+  }
+
+  Future<List<Map<String, dynamic>>?> fetchPuzzles(int nb) async {
+    final url = Uri.parse("https://lichess.org/api/puzzle/batch?nb=$nb");
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as List;
+      return data.map((e) => e as Map<String, dynamic>).toList();
     }
     return null;
   }

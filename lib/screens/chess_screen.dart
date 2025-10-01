@@ -1,9 +1,10 @@
-import 'package:chess_bot_only_flutter/screens/solo_game_screen.dart';
-import 'package:chess_bot_only_flutter/widgets/botton_menu_widget.dart';
+import 'package:chess_bot_only_flutter/widgets/bottom_menu_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:chess/chess.dart' as chess;
 import '../services/api_service.dart';
+import 'solo_game_screen.dart';
+import 'problems_screen.dart';
 
 class ChessScreen extends StatefulWidget {
   final bool playAsBlack;
@@ -20,6 +21,7 @@ class _ChessScreenState extends State<ChessScreen> {
   final ApiService api = ApiService();
   int game_id = 0;
   int _selectedIndex = 0;
+  List<String> moveHistory = [];
 
   @override
   void initState() {
@@ -27,6 +29,26 @@ class _ChessScreenState extends State<ChessScreen> {
     controller = ChessBoardController();
     game = chess.Chess();
     startGame();
+  }
+
+  void _onMenuTap(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    if (index == 0) {
+      // Already here
+    } else if (index == 1) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SoloGameScreen()),
+      );
+    } else if (index == 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProblemsScreen()),
+      );
+    }
   }
 
   Future<void> startGame() async {
@@ -61,6 +83,7 @@ class _ChessScreenState extends State<ChessScreen> {
 
     controller.makeMove(from: from, to: to);
     game.move({'from': from, 'to': to});
+    moveHistory.add(playerMove);
 
     final res = await api.makeMove(game_id, playerMove);
     if (!mounted) return;
@@ -68,6 +91,7 @@ class _ChessScreenState extends State<ChessScreen> {
     if (res == null || res['engine_move'] == null) {
       controller.loadFen(prevFen);
       game.load(prevFen);
+      moveHistory.removeLast();
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Jogada inválida!")));
@@ -82,6 +106,7 @@ class _ChessScreenState extends State<ChessScreen> {
       controller.makeMove(from: engineFrom, to: engineTo);
     });
     game.move({'from': engineFrom, 'to': engineTo});
+    moveHistory.add(engineMove);
 
     setState(() {});
   }
@@ -116,23 +141,40 @@ class _ChessScreenState extends State<ChessScreen> {
   void resetGame() async {
     controller.resetBoard();
     game.reset();
+    moveHistory.clear();
     await startGame();
   }
 
-  void _onMenuTap(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    if (index == 0) {
-      resetGame(); // reinicia no modo difícil
-    } else if (index == 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SoloGameScreen()),
-      );
-    } 
+  void _showMoveHistory() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Histórico de Jogadas"),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            itemCount: moveHistory.length,
+            itemBuilder: (context, index) {
+              final move = moveHistory[index];
+              final moveNumber = (index ~/ 2) + 1;
+              final isWhite = index % 2 == 0;
+              return ListTile(
+                title: Text("$moveNumber. ${isWhite ? 'Brancas' : 'Pretas'}: $move"),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Fechar"),
+          ),
+        ],
+      ),
+    );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -166,9 +208,11 @@ class _ChessScreenState extends State<ChessScreen> {
             ),
       bottomNavigationBar: BottomMenu(
         currentIndex: _selectedIndex,
-        onTap: (index) {
-          // callback se quiser monitorar a troca de abas
-        },
+        onTap: _onMenuTap,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showMoveHistory,
+        child: const Icon(Icons.history),
       ),
     );
   }
