@@ -52,13 +52,19 @@ class ApiService {
     return null;
   }
 
-  Future<List<Map<String, dynamic>>?> fetchPuzzles(int nb) async {
-    final url = Uri.parse("https://lichess.org/api/puzzle/batch?nb=$nb");
-    final response = await http.get(url);
+  Future<Map<String, dynamic>?> fetchPuzzle() async {
+    final nextUrl = Uri.parse("https://lichess.org/api/puzzle/next");
+    final nextResponse = await http.get(nextUrl);
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body) as List;
-      return data.map((e) => e as Map<String, dynamic>).toList();
+    if (nextResponse.statusCode == 200) {
+      final nextData = jsonDecode(nextResponse.body) as Map<String, dynamic>;
+      final puzzleId = nextData['puzzle']['id'];
+      final puzzleUrl = Uri.parse("https://lichess.org/api/puzzle/$puzzleId");
+      final puzzleResponse = await http.get(puzzleUrl);
+
+      if (puzzleResponse.statusCode == 200) {
+        return jsonDecode(puzzleResponse.body) as Map<String, dynamic>;
+      }
     }
     return null;
   }

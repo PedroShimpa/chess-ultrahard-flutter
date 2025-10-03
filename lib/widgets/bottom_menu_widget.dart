@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/chess_screen.dart';
 import '../screens/solo_game_screen.dart';
-import '../screens/problems_screen.dart';
 
 class BottomMenu extends StatelessWidget {
   final int currentIndex;
@@ -28,11 +27,6 @@ class BottomMenu extends StatelessWidget {
             context,
             MaterialPageRoute(builder: (context) => const SoloGameScreen()),
           );
-        } else if (index == 2) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const ProblemsScreen()),
-          );
         }
         onTap(index);
       },
@@ -44,10 +38,6 @@ class BottomMenu extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
           label: "Solo",
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.extension),
-          label: "Problemas",
         ),
       ],
     );

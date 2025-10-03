@@ -4,7 +4,6 @@ import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:chess/chess.dart' as chess;
 import '../services/api_service.dart';
 import 'chess_screen.dart';
-import 'problems_screen.dart';
 
 class SoloGameScreen extends StatefulWidget {
   final bool playAsBlack;
@@ -51,7 +50,9 @@ class _SoloGameScreenState extends State<SoloGameScreen> {
       game.load(body['fen']);
       game_id = body['game_id'];
     }
-    setState(() => loading = false);
+    if (mounted) {
+      setState(() => loading = false);
+    }
   }
 
   Future<void> handleMove(String playerMove) async {
@@ -75,12 +76,14 @@ class _SoloGameScreenState extends State<SoloGameScreen> {
       return;
     }
 
-    setState(() {
-      evaluation = res["evaluation"] ?? "";
-      bestMoveWhite = res["best_move_for_side"] ?? "";
-      bestMoveBlack = res["best_move_opponent"] ?? "";
-      showBestMoveOverlay = true; // mostrar overlay após a jogada
-    });
+    if (mounted) {
+      setState(() {
+        evaluation = res["evaluation"] ?? "";
+        bestMoveWhite = res["best_move_for_side"] ?? "";
+        bestMoveBlack = res["best_move_opponent"] ?? "";
+        showBestMoveOverlay = true; // mostrar overlay após a jogada
+      });
+    }
   }
 
   String? detectPlayerMove() {
@@ -104,6 +107,7 @@ class _SoloGameScreenState extends State<SoloGameScreen> {
   void onPlayerMove() {
     final playerMove = detectPlayerMove();
     if (playerMove != null) {
+      if (!mounted) return;
       setState(() {
         showBestMoveOverlay = false; // remove overlay ao clicar
       });
@@ -117,12 +121,15 @@ class _SoloGameScreenState extends State<SoloGameScreen> {
     controller.resetBoard();
     game.reset();
     await startGame();
-    setState(() {
-      showBestMoveOverlay = true;
-    });
+    if (mounted) {
+      setState(() {
+        showBestMoveOverlay = true;
+      });
+    }
   }
 
   void _onMenuTap(int index) {
+    if (!mounted) return;
     setState(() {
       _selectedIndex = index;
     });
@@ -134,16 +141,12 @@ class _SoloGameScreenState extends State<SoloGameScreen> {
       );
     } else if (index == 1) {
       resetGame(); // já está na tela solo, só reinicia
-    } else if (index == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const ProblemsScreen()),
-      );
     }
   }
 
   // Função para inverter o tabuleiro
   void invertBoard() {
+    if (!mounted) return;
     setState(() {
       boardOrientation = boardOrientation == PlayerColor.white
           ? PlayerColor.black

@@ -1,0 +1,3 @@
+- [ ] Update ApiService.fetchPuzzles to fetchPuzzle() using /api/puzzle/next and return the puzzle map
+- [ ] Update ProblemsScreen to use single currentPuzzle instead of list
+- [ ] Adjust fetchPuzzles, loadPuzzle, nextPuzzle, and UI accordingly

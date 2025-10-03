@@ -4,7 +4,6 @@ import 'package:flutter_chess_board/flutter_chess_board.dart';
 import 'package:chess/chess.dart' as chess;
 import '../services/api_service.dart';
 import 'solo_game_screen.dart';
-import 'problems_screen.dart';
 
 class ChessScreen extends StatefulWidget {
   final bool playAsBlack;
@@ -42,11 +41,6 @@ class _ChessScreenState extends State<ChessScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const SoloGameScreen()),
-      );
-    } else if (index == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const ProblemsScreen()),
       );
     }
   }
